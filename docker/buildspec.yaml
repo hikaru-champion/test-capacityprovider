@@ -7,26 +7,38 @@ phases:
       - aws --version
       - echo $AWS_DEFAULT_REGION
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - NGINX_REPOSITORY_URI01=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NGINX_IMAGE_REPO_NAME01
+      - NGINX_REPOSITORY_URI02=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$NGINX_IMAGE_REPO_NAME02    
       - IMAGE_TAG=1
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo Building the Docker image for nginx01...
+      - docker build -t $NGINX_REPOSITORY_URI01:$IMAGE_TAG nginx01/
+      - echo Building the Docker image for nginx02...
+      - docker build -t $NGINX_REPOSITORY_URI02:$IMAGE_TAG nginx02/
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - printf '{"Version":"1.0","ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
-      - sed -i -e "s#<TASK_FAMILY>#${TASK_FAMILY}#" taskdef.json
-      - sed -i -e "s#<EXECUTION_ROLE_ARN>#${EXECUTION_ROLE_ARN}#" taskdef.json
-      - sed -i -e "s#<CONTAINER_NAME>#${CONTAINER_NAME}#" taskdef.json
-      - sed -i -e "s#<CONTAINER_NAME>#${CONTAINER_NAME}#" appspec.yaml
+      - echo Pushing the Docker image for nginx01...
+      - docker push $NGINX_REPOSITORY_URI01:$IMAGE_TAG
+      - IMAGE_URL1=$NGINX_REPOSITORY_URI01:$IMAGE_TAG
+      - echo Pushing the Docker image for nginx02...
+      - docker push $NGINX_REPOSITORY_URI02:$IMAGE_TAG
+      - IMAGE_URL2=$NGINX_REPOSITORY_URI02:$IMAGE_TAG
+      - sed -i -e "s#<TASK_FAMILY01>#${TASK_FAMILY01}#" stg01/nginx01-taskdef.json
+      - sed -i -e "s#<TASK_FAMILY02>#${TASK_FAMILY02}#" stg01/nginx02-taskdef.json
+      - sed -i -e "s#<EXECUTION_ROLE_ARN>#${EXECUTION_ROLE_ARN}#" stg01/nginx01-taskdef.json
+      - sed -i -e "s#<EXECUTION_ROLE_ARN>#${EXECUTION_ROLE_ARN}#" stg01/nginx02-taskdef.json
+      - sed -i -e "s#<CONTAINER_NAME01>#${CONTAINER_NAME01}#" stg01/nginx01-taskdef.json
+      - sed -i -e "s#<CONTAINER_NAME02>#${CONTAINER_NAME02}#" stg01/nginx02-taskdef.json
+      - sed -i -e "s#<IMAGE1_NAME>#${IMAGE_URL1}#" stg01/nginx01-taskdef.json
+      - sed -i -e "s#<IMAGE2_NAME>#${IMAGE_URL2}#" stg01/nginx02-taskdef.json
+      - sed -i -e "s#<CONTAINER_NAME01>#${CONTAINER_NAME01}#" nginx01-appspec.yaml
+      - sed -i -e "s#<CONTAINER_NAME02>#${CONTAINER_NAME02}#" nginx02-appspec.yaml
 artifacts:
   files:
-    - imageDetail.json
-    - taskdef.json
-    - appspec.yaml
+    - stg01/nginx01-taskdef.json
+    - stg01/nginx02-taskdef.json
+    - nginx01-appspec.yaml
+    - nginx02-appspec.yaml

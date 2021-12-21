@@ -1,0 +1,17 @@
+FROM public.ecr.aws/docker/library/alpine:latest
+
+# nginxのインストール
+RUN apk update && \
+    apk add --no-cache nginx
+
+# ドキュメントルート
+ADD app /app
+ADD default.conf /etc/nginx/http.d/default.conf
+
+# ポート設定
+EXPOSE 8080
+
+RUN mkdir -p /run/nginx
+
+# フォアグラウンドでnginx実行
+CMD nginx -g "daemon off;"

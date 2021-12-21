@@ -1,0 +1,24 @@
+{
+    "family": "<TASK_FAMILY01>",
+    "requiresCompatibilities": ["EC2"],
+    "networkMode": "awsvpc",
+    "ipc_mode": "none",
+    "pid_mode": "task",
+    "executionRoleArn": "<EXECUTION_ROLE_ARN>",
+    "containerDefinitions": [
+      {
+        "name": "<CONTAINER_NAME01>",
+        "image": "<IMAGE1_NAME>",
+        "cpu": 128,
+        "memoryReservation": 128,
+        "essential": true,
+        "portMappings": [
+          {
+            "hostPort": 80,
+            "containerPort": 80,
+            "protocol": "tcp"
+          }
+        ]
+      }
+    ]
+  }
