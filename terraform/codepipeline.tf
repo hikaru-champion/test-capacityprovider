@@ -13,7 +13,7 @@ resource "aws_codepipeline" "this" {
     action {
       run_order        = 1
       name             = "Source"
-      namespace        = "SourceVariables"
+      #namespace        = "SourceVariables"
       category         = "Source"
       owner            = "AWS"
       provider         = "S3"
@@ -33,7 +33,7 @@ resource "aws_codepipeline" "this" {
 
     action {
       name             = "Build"
-      namespace        = "BuildVariables"
+      #namespace        = "BuildVariables"
       category         = "Build"
       owner            = "AWS"
       provider         = "CodeBuild"
@@ -64,7 +64,7 @@ resource "aws_codepipeline" "this" {
     name = "Deploy"
 
     action {
-      name      = "Deploy"
+      name      = "Deploy01"
       category  = "Deploy"
       owner     = "AWS"
       provider  = "CodeDeployToECS"
@@ -74,19 +74,44 @@ resource "aws_codepipeline" "this" {
 
       configuration = {
         ApplicationName                = aws_codedeploy_app.ecs_codedeploy_app.name
-        DeploymentGroupName            = "test-ecs-codedeploygroup"
+        DeploymentGroupName            = "test-ecs-codedeploygroup01"
         TaskDefinitionTemplateArtifact = "BuildArtifact"
+        TaskDefinitionTemplatePath     = "stg01/nginx01-taskdef.json"
         AppSpecTemplateArtifact        = "BuildArtifact"
-        Image1ArtifactName             = "BuildArtifact"
-        Image1ContainerName            = "IMAGE1_NAME"
-
+        AppSpecTemplatePath            = "nginx01-appspec.yaml"
+#        Image1ArtifactName             = "BuildArtifact"
+#        Image1ContainerName            = "IMAGE1_NAME"
       }
 
       input_artifacts = [
         "BuildArtifact",
       ]
-
     }
-  }
 
+    action {
+      name      = "Deploy02"
+      category  = "Deploy"
+      owner     = "AWS"
+      provider  = "CodeDeployToECS"
+      region    = "ap-northeast-1"
+      run_order = 2
+      version   = "1"
+
+      configuration = {
+        ApplicationName                = aws_codedeploy_app.ecs_codedeploy_app.name
+        DeploymentGroupName            = "test-ecs-codedeploygroup02"
+        TaskDefinitionTemplateArtifact = "BuildArtifact"
+        TaskDefinitionTemplatePath     = "stg01/nginx02-taskdef.json"
+        AppSpecTemplateArtifact        = "BuildArtifact"
+        AppSpecTemplatePath            = "nginx02-appspec.yaml"
+#        Image1ArtifactName             = "BuildArtifact"
+#        Image1ContainerName            = "IMAGE1_NAME"
+      }
+
+      input_artifacts = [
+        "BuildArtifact",
+      ]
+    }
+
+  }
 }

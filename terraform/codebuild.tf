@@ -27,13 +27,23 @@ resource "aws_codebuild_project" "test_ecs_codebuild" {
     }
 
     environment_variable {
-      name  = "IMAGE_REPO_NAME"
-      value = aws_ecr_repository.nginx_image_repo.name
+      name  = "NGINX_IMAGE_REPO_NAME01"
+      value = aws_ecr_repository.nginx01_image_repo.name
     }
 
     environment_variable {
-      name  = "TASK_FAMILY"
-      value = "nginx_task"
+      name  = "NGINX_IMAGE_REPO_NAME02"
+      value = aws_ecr_repository.nginx02_image_repo.name
+    }
+
+    environment_variable {
+      name  = "TASK_FAMILY01"
+      value = "nginx01_task"
+    }
+
+    environment_variable {
+      name  = "TASK_FAMILY02"
+      value = "nginx02_task"
     }
 
     environment_variable {
@@ -42,8 +52,13 @@ resource "aws_codebuild_project" "test_ecs_codebuild" {
     }
 
     environment_variable {
-      name  = "CONTAINER_NAME"
-      value = "nginx-container"
+      name  = "CONTAINER_NAME01"
+      value = "nginx01-container"
+    }
+
+    environment_variable {
+      name  = "CONTAINER_NAME02"
+      value = "nginx02-container"
     }
   }
 
