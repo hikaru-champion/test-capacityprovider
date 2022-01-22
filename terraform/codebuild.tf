@@ -23,7 +23,7 @@ resource "aws_codebuild_project" "test_ecs_codebuild" {
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = "503497204644"
+      value = ""
     }
 
     environment_variable {

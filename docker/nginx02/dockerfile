@@ -9,7 +9,7 @@ ADD app /app
 ADD default.conf /etc/nginx/http.d/default.conf
 
 # ポート設定
-EXPOSE 8080
+EXPOSE 80
 
 RUN mkdir -p /run/nginx
 
